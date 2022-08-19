@@ -1,0 +1,19 @@
+BootStrap: docker
+From: opensuse/tumbleweed
+
+%files
+../repos/ilastik-1.4.0b27post1-gpu-Linux.tar.bz2 /opt/
+
+%post
+zypper in -y python3 libglvnd libgthread-2_0-0 python3-qt5 tar bzip2
+cd /opt
+tar -xvf ilastik-1.4.0b27post1-gpu-Linux.tar.bz2
+rm /opt/ilastik-1.4.0b27post1-gpu-Linux.tar.bz2
+
+%runscript 
+/opt/ilastik-1.4.0b27post1-gpu-Linux/run_ilastik.sh $@
+
+%labels
+Author jose.pereira@lnbio.cnpem.br
+Version v0.0.1
+Info OpenSuSE Tumbleweed with ilastik preinstalled.
