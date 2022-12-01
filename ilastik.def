@@ -1,19 +1,24 @@
-BootStrap: docker
-From: opensuse/tumbleweed
-
-%files
-../repos/ilastik-1.4.0b27post1-gpu-Linux.tar.bz2 /opt/
+BootStrap: library 
+From: ubuntu:latest
 
 %post
-zypper in -y python3 libglvnd libgthread-2_0-0 python3-qt5 tar bzip2
-cd /opt
-tar -xvf ilastik-1.4.0b27post1-gpu-Linux.tar.bz2
-rm /opt/ilastik-1.4.0b27post1-gpu-Linux.tar.bz2
+export DEBIAN_FRONTEND=noninteractive
 
-%runscript 
-/opt/ilastik-1.4.0b27post1-gpu-Linux/run_ilastik.sh $@
+apt-get update && apt-get -y install qt5dxcb-plugin fontconfig wget 
 
-%labels
-Author jose.pereira@lnbio.cnpem.br
-Version v0.0.1
-Info OpenSuSE Tumbleweed with ilastik preinstalled.
+wget -P /tmp \
+    "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh" \
+    && bash /tmp/Mambaforge-Linux-x86_64.sh -b -p /opt/mambaforge \
+    && rm /tmp/Mambaforge-Linux-x86_64.sh
+
+. /opt/mambaforge/bin/activate
+mamba create -n ilastik --override-channels -c pytorch -c ilastik-forge -c conda-forge ilastik
+mamba clean -a -y
+
+
+%environment
+. /opt/mambaforge/bin/activate
+conda activate ilastik
+
+%runscript
+ilastik $@
